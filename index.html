@@ -146,30 +146,68 @@
         <p class="text-xl text-blue-200">العودة للدراسة والانضباط المدرسي</p>
     </div>
 
-    <!-- Team Names Setup Modal -->
-    <div id="setupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-2xl p-8 max-w-2xl mx-4 text-center">
+    <!-- Team Count Selection Modal -->
+    <div id="teamCountModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-lg mx-4 text-center">
             <div class="text-6xl mb-4">🎮</div>
             <h2 class="text-3xl font-bold text-gray-800 mb-6">مرحباً بكم في لعبة المعرفة!</h2>
-            <p class="text-lg text-gray-600 mb-6">أدخلوا أسماء الفرق الأربعة للبدء</p>
+            <p class="text-lg text-gray-600 mb-6">كم عدد الفرق المشاركة؟</p>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label class="block text-right font-bold mb-2" style="color: #FFAA3C;">الفريق الأول:</label>
-                    <input type="text" id="teamInput1" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #FFAA3C;" placeholder="اسم الفريق الأول" maxlength="20">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                <button onclick="selectTeamCount(2)" class="bg-blue-100 hover:bg-blue-200 text-blue-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-blue-300">
+                    فريقان
+                </button>
+                <button onclick="selectTeamCount(3)" class="bg-green-100 hover:bg-green-200 text-green-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-green-300">
+                    3 فرق
+                </button>
+                <button onclick="selectTeamCount(4)" class="bg-purple-100 hover:bg-purple-200 text-purple-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-purple-300">
+                    4 فرق
+                </button>
+                <button onclick="selectTeamCount(5)" class="bg-orange-100 hover:bg-orange-200 text-orange-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-orange-300">
+                    5 فرق
+                </button>
+                <button onclick="selectTeamCount(6)" class="bg-red-100 hover:bg-red-200 text-red-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-red-300">
+                    6 فرق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Question Count Selection Modal -->
+    <div id="questionCountModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl mx-4 text-center">
+            <div class="text-6xl mb-4">❓</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">كم عدد الأسئلة؟</h2>
+            <p class="text-lg text-gray-600 mb-6">اختر عدد الأسئلة المناسب للمسابقة</p>
+            
+            <div class="mb-6">
+                <label class="block text-lg font-bold text-gray-700 mb-4">عدد الأسئلة:</label>
+                <input type="range" id="questionSlider" min="5" max="40" value="20" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-sm text-gray-500 mt-2">
+                    <span>5</span>
+                    <span>40</span>
                 </div>
-                <div>
-                    <label class="block text-right font-bold mb-2" style="color: #E6447D;">الفريق الثاني:</label>
-                    <input type="text" id="teamInput2" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #E6447D;" placeholder="اسم الفريق الثاني" maxlength="20">
+                <div class="mt-4">
+                    <span class="text-3xl font-bold text-blue-600" id="questionCountDisplay">20</span>
+                    <span class="text-lg text-gray-600"> سؤال</span>
                 </div>
-                <div>
-                    <label class="block text-right font-bold mb-2" style="color: #652E79;">الفريق الثالث:</label>
-                    <input type="text" id="teamInput3" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #652E79;" placeholder="اسم الفريق الثالث" maxlength="20">
-                </div>
-                <div>
-                    <label class="block text-right font-bold mb-2" style="color: #4BD4D4;">الفريق الرابع:</label>
-                    <input type="text" id="teamInput4" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #4BD4D4;" placeholder="اسم الفريق الرابع" maxlength="20">
-                </div>
+            </div>
+            
+            <button onclick="proceedToTeamNames()" class="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg transition-all duration-300 transform hover:scale-105">
+                التالي ✏️
+            </button>
+        </div>
+    </div>
+
+    <!-- Team Names Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl p-8 max-w-4xl mx-4 text-center">
+            <div class="text-6xl mb-4">✏️</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">أدخلوا أسماء الفرق</h2>
+            <p class="text-lg text-gray-600 mb-6">يمكنكم ترك الحقول فارغة لاستخدام الأسماء الافتراضية</p>
+            
+            <div id="teamInputsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                <!-- Team inputs will be generated here -->
             </div>
             
             <button onclick="startGame()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg transition-all duration-300 transform hover:scale-105">
@@ -179,26 +217,8 @@
     </div>
 
     <!-- Teams Display -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 mb-8">
-        <div id="team1" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #FFAA3C;">
-            <h3 class="font-bold text-lg mb-2" style="color: #FFAA3C;" id="teamName1">الفريق البرتقالي</h3>
-            <div class="text-2xl font-bold text-gray-800" id="score1">0</div>
-        </div>
-        
-        <div id="team2" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #E6447D;">
-            <h3 class="font-bold text-lg mb-2" style="color: #E6447D;" id="teamName2">الفريق الوردي</h3>
-            <div class="text-2xl font-bold text-gray-800" id="score2">0</div>
-        </div>
-        
-        <div id="team3" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #652E79;">
-            <h3 class="font-bold text-lg mb-2" style="color: #652E79;" id="teamName3">الفريق البنفسجي</h3>
-            <div class="text-2xl font-bold text-gray-800" id="score3">0</div>
-        </div>
-        
-        <div id="team4" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #4BD4D4;">
-            <h3 class="font-bold text-lg mb-2" style="color: #4BD4D4;" id="teamName4">الفريق الفيروزي</h3>
-            <div class="text-2xl font-bold text-gray-800" id="score4">0</div>
-        </div>
+    <div id="teamsContainer" class="grid gap-4 px-4 mb-8">
+        <!-- Teams will be generated dynamically -->
     </div>
 
     <!-- Current Turn Indicator -->
@@ -212,7 +232,7 @@
     <!-- Question Counter -->
     <div class="text-center mb-6">
         <div class="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full px-6 py-2 font-bold text-lg shadow-lg">
-            السؤال <span id="questionNumber">1</span> من 20
+            السؤال <span id="questionNumber">1</span> من <span id="totalQuestions">20</span>
         </div>
     </div>
 
@@ -416,33 +436,223 @@
                 answers: ["غير مهم", "أساس النجاح", "صعب التطبيق", "مقيد للحرية"],
                 correct: 1,
                 emoji: "⭐"
+            },
+            {
+                question: "ما هي أفضل طريقة للمذاكرة؟",
+                answers: ["القراءة السريعة", "التكرار والفهم", "الحفظ فقط", "عدم المذاكرة"],
+                correct: 1,
+                emoji: "📖"
+            },
+            {
+                question: "كيف نتعامل مع صعوبة المواد الدراسية؟",
+                answers: ["التجاهل", "طلب المساعدة", "الاستسلام", "التأجيل"],
+                correct: 1,
+                emoji: "🤔"
+            },
+            {
+                question: "ما أهمية الرياضة للطلاب؟",
+                answers: ["غير مهمة", "تحسن الصحة والتركيز", "مضيعة للوقت", "صعبة جداً"],
+                correct: 1,
+                emoji: "⚽"
+            },
+            {
+                question: "كيف نحسن من مهارات التواصل؟",
+                answers: ["تجنب الحديث", "الممارسة والتدريب", "الصمت دائماً", "عدم الاهتمام"],
+                correct: 1,
+                emoji: "🗣️"
+            },
+            {
+                question: "ما فائدة استخدام التكنولوجيا في التعلم؟",
+                answers: ["لا فائدة", "تسهل الفهم", "تشتت الانتباه", "صعبة الاستخدام"],
+                correct: 1,
+                emoji: "💻"
+            },
+            {
+                question: "كيف نتعامل مع ضغط الوالدين؟",
+                answers: ["المقاومة", "التفاهم والحوار", "التجاهل", "الغضب"],
+                correct: 1,
+                emoji: "👨‍👩‍👧‍👦"
+            },
+            {
+                question: "ما أهمية تعلم لغات جديدة؟",
+                answers: ["غير مهم", "يوسع الآفاق", "صعب جداً", "مضيعة للوقت"],
+                correct: 1,
+                emoji: "🌍"
+            },
+            {
+                question: "كيف نطور مهارات حل المشكلات؟",
+                answers: ["تجنب المشاكل", "التفكير النقدي", "الاعتماد على الآخرين", "التسرع في الحلول"],
+                correct: 1,
+                emoji: "🧩"
+            },
+            {
+                question: "ما فائدة المطالعة الحرة؟",
+                answers: ["لا فائدة", "تنمي الخيال والمعرفة", "مملة", "صعبة"],
+                correct: 1,
+                emoji: "📚"
+            },
+            {
+                question: "كيف نحافظ على الصحة النفسية؟",
+                answers: ["تجاهل المشاعر", "التوازن والراحة", "العزلة", "الإفراط في العمل"],
+                correct: 1,
+                emoji: "🧠"
+            },
+            {
+                question: "ما أهمية التطوع والعمل الخيري؟",
+                answers: ["غير مهم", "ينمي الشخصية", "مضيعة للوقت", "صعب التطبيق"],
+                correct: 1,
+                emoji: "❤️"
+            },
+            {
+                question: "كيف نتعامل مع الفشل؟",
+                answers: ["الاستسلام", "التعلم والمحاولة مرة أخرى", "إلقاء اللوم", "تجنب المحاولة"],
+                correct: 1,
+                emoji: "💪"
+            },
+            {
+                question: "ما فائدة تعلم المهارات العملية؟",
+                answers: ["لا فائدة", "تساعد في الحياة", "صعبة التعلم", "غير ضرورية"],
+                correct: 1,
+                emoji: "🔧"
+            },
+            {
+                question: "كيف نطور الثقة بالنفس؟",
+                answers: ["تجنب التحديات", "التدريب والممارسة", "الاعتماد على الآخرين", "التردد المستمر"],
+                correct: 1,
+                emoji: "✨"
+            },
+            {
+                question: "ما أهمية احترام الوقت؟",
+                answers: ["غير مهم", "أساس النجاح", "صعب التطبيق", "مقيد للحرية"],
+                correct: 1,
+                emoji: "⏰"
+            },
+            {
+                question: "كيف نتعامل مع التنمر؟",
+                answers: ["الصمت", "طلب المساعدة", "الانتقام", "تجاهل الأمر"],
+                correct: 1,
+                emoji: "🛡️"
+            },
+            {
+                question: "ما فائدة تعلم الفنون؟",
+                answers: ["لا فائدة", "تنمي الإبداع", "مضيعة للوقت", "صعبة التعلم"],
+                correct: 1,
+                emoji: "🎨"
+            },
+            {
+                question: "كيف نحافظ على البيئة؟",
+                answers: ["لا يهمني", "بالسلوكيات الإيجابية", "مسؤولية الآخرين", "صعب جداً"],
+                correct: 1,
+                emoji: "🌱"
+            },
+            {
+                question: "ما أهمية التخطيط للمستقبل؟",
+                answers: ["غير ضروري", "يساعد على تحقيق الأهداف", "مضيعة للوقت", "صعب التنفيذ"],
+                correct: 1,
+                emoji: "🎯"
+            },
+            {
+                question: "كيف نطور مهارات القيادة؟",
+                answers: ["تجنب المسؤولية", "التدريب والممارسة", "الاعتماد على الآخرين", "عدم المحاولة"],
+                correct: 1,
+                emoji: "👑"
             }
         ];
 
         let currentQuestionIndex = 0;
         let currentTeam = 1;
-        let scores = [0, 0, 0, 0];
+        let scores = [];
         let gameEnded = false;
         let gameStarted = false;
+        let numberOfTeams = 4;
+        let numberOfQuestions = 20;
+        let selectedQuestions = [];
         
-        const teamColors = ['#FFAA3C', '#E6447D', '#652E79', '#4BD4D4'];
-        let teamNames = ['الفريق البرتقالي', 'الفريق الوردي', 'الفريق البنفسجي', 'الفريق الفيروزي'];
-        const teamEmojis = ['🟠', '🌸', '💜', '🩵'];
+        const teamColors = ['#FFAA3C', '#E6447D', '#652E79', '#4BD4D4', '#FF6B6B', '#4ECDC4'];
+        let teamNames = [];
+        const teamEmojis = ['🟠', '🌸', '💜', '🩵', '❤️', '💚'];
+        const defaultTeamNames = ['الفريق البرتقالي', 'الفريق الوردي', 'الفريق البنفسجي', 'الفريق الفيروزي', 'الفريق الأحمر', 'الفريق الأخضر'];
+
+        // Update question count display
+        document.getElementById('questionSlider').addEventListener('input', function() {
+            document.getElementById('questionCountDisplay').textContent = this.value;
+        });
+
+        function selectTeamCount(count) {
+            numberOfTeams = count;
+            scores = new Array(count).fill(0);
+            teamNames = defaultTeamNames.slice(0, count);
+            
+            // Hide team count modal and show question count modal
+            document.getElementById('teamCountModal').classList.add('hidden');
+            document.getElementById('questionCountModal').classList.remove('hidden');
+        }
+
+        function proceedToTeamNames() {
+            numberOfQuestions = parseInt(document.getElementById('questionSlider').value);
+            
+            // Shuffle and select questions
+            const shuffledQuestions = [...questions].sort(() => Math.random() - 0.5);
+            selectedQuestions = shuffledQuestions.slice(0, numberOfQuestions);
+            
+            // Update total questions display
+            document.getElementById('totalQuestions').textContent = numberOfQuestions;
+            
+            // Hide question count modal and show setup modal
+            document.getElementById('questionCountModal').classList.add('hidden');
+            document.getElementById('setupModal').classList.remove('hidden');
+            
+            // Generate team input fields
+            generateTeamInputs();
+            generateTeamsDisplay();
+        }
+
+        function generateTeamInputs() {
+            const container = document.getElementById('teamInputsContainer');
+            container.innerHTML = '';
+            
+            for (let i = 0; i < numberOfTeams; i++) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <label class="block text-right font-bold mb-2" style="color: ${teamColors[i]};">الفريق ${i + 1}:</label>
+                    <input type="text" id="teamInput${i + 1}" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: ${teamColors[i]};" placeholder="${defaultTeamNames[i]}" maxlength="20">
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function generateTeamsDisplay() {
+            const container = document.getElementById('teamsContainer');
+            container.innerHTML = '';
+            
+            // Set grid columns based on number of teams
+            const gridCols = numberOfTeams <= 2 ? 'grid-cols-2' : 
+                           numberOfTeams <= 3 ? 'grid-cols-3' : 
+                           numberOfTeams <= 4 ? 'grid-cols-2 md:grid-cols-4' : 
+                           numberOfTeams <= 6 ? 'grid-cols-2 md:grid-cols-3' : 'grid-cols-2 md:grid-cols-4';
+            
+            container.className = `grid ${gridCols} gap-4 px-4 mb-8`;
+            
+            for (let i = 0; i < numberOfTeams; i++) {
+                const teamDiv = document.createElement('div');
+                teamDiv.id = `team${i + 1}`;
+                teamDiv.className = 'team-card bg-white rounded-xl p-4 text-center shadow-lg border-4';
+                teamDiv.style.borderColor = teamColors[i];
+                teamDiv.innerHTML = `
+                    <h3 class="font-bold text-lg mb-2" style="color: ${teamColors[i]};" id="teamName${i + 1}">${teamNames[i]}</h3>
+                    <div class="text-2xl font-bold text-gray-800" id="score${i + 1}">0</div>
+                `;
+                container.appendChild(teamDiv);
+            }
+        }
 
         function startGame() {
             // Get team names from inputs
-            const team1Name = document.getElementById('teamInput1').value.trim() || 'الفريق البرتقالي';
-            const team2Name = document.getElementById('teamInput2').value.trim() || 'الفريق الوردي';
-            const team3Name = document.getElementById('teamInput3').value.trim() || 'الفريق البنفسجي';
-            const team4Name = document.getElementById('teamInput4').value.trim() || 'الفريق الفيروزي';
-            
-            teamNames = [team1Name, team2Name, team3Name, team4Name];
-            
-            // Update team display names
-            document.getElementById('teamName1').textContent = team1Name;
-            document.getElementById('teamName2').textContent = team2Name;
-            document.getElementById('teamName3').textContent = team3Name;
-            document.getElementById('teamName4').textContent = team4Name;
+            for (let i = 0; i < numberOfTeams; i++) {
+                const inputValue = document.getElementById(`teamInput${i + 1}`).value.trim();
+                teamNames[i] = inputValue || defaultTeamNames[i];
+                document.getElementById(`teamName${i + 1}`).textContent = teamNames[i];
+            }
             
             // Hide setup modal
             document.getElementById('setupModal').classList.add('hidden');
@@ -460,7 +670,7 @@
             currentTeamElement.style.color = teamColors[currentTeam - 1];
             
             // Highlight current team
-            for (let i = 1; i <= 4; i++) {
+            for (let i = 1; i <= numberOfTeams; i++) {
                 const teamCard = document.getElementById(`team${i}`);
                 if (i === currentTeam) {
                     teamCard.classList.add('active');
@@ -471,7 +681,7 @@
         }
 
         function displayQuestion() {
-            const question = questions[currentQuestionIndex];
+            const question = selectedQuestions[currentQuestionIndex];
             document.getElementById('questionText').textContent = question.question;
             document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
             
@@ -491,7 +701,7 @@
         }
 
         function selectAnswer(answerIndex) {
-            const question = questions[currentQuestionIndex];
+            const question = selectedQuestions[currentQuestionIndex];
             const answerButtons = document.querySelectorAll('.answer-btn');
             const isCorrect = answerIndex === question.correct;
             
@@ -569,13 +779,13 @@
         function nextQuestion() {
             currentQuestionIndex++;
             
-            if (currentQuestionIndex >= questions.length) {
+            if (currentQuestionIndex >= numberOfQuestions) {
                 showFinalResults();
                 return;
             }
             
             // Switch to next team
-            currentTeam = (currentTeam % 4) + 1;
+            currentTeam = (currentTeam % numberOfTeams) + 1;
             updateCurrentTeamDisplay();
             
             // Reset answer buttons
@@ -625,27 +835,25 @@
         function restartGame() {
             currentQuestionIndex = 0;
             currentTeam = 1;
-            scores = [0, 0, 0, 0];
+            scores = [];
             gameEnded = false;
             gameStarted = false;
+            numberOfTeams = 4;
+            numberOfQuestions = 20;
+            selectedQuestions = [];
+            teamNames = [];
             
-            // Reset scores display
-            for (let i = 1; i <= 4; i++) {
-                document.getElementById(`score${i}`).textContent = '0';
-            }
-            
-            // Reset team names to default
-            teamNames = ['الفريق البرتقالي', 'الفريق الوردي', 'الفريق البنفسجي', 'الفريق الفيروزي'];
-            document.getElementById('teamInput1').value = '';
-            document.getElementById('teamInput2').value = '';
-            document.getElementById('teamInput3').value = '';
-            document.getElementById('teamInput4').value = '';
+            // Reset slider
+            document.getElementById('questionSlider').value = 20;
+            document.getElementById('questionCountDisplay').textContent = '20';
             
             document.getElementById('resultsModal').classList.add('hidden');
-            document.getElementById('setupModal').classList.remove('hidden');
+            document.getElementById('setupModal').classList.add('hidden');
+            document.getElementById('questionCountModal').classList.add('hidden');
+            document.getElementById('teamCountModal').classList.remove('hidden');
         }
 
         // Game will start when user clicks start button
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96e9cdb7d61c0e85',t:'MTc1NTEwNDc5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96ea20bc2197e9ef',t:'MTc1NTEwODE5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
