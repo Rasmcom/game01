@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة المعرفة التنافسية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap');
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .team-card {
+            transition: all 0.3s ease;
+        }
+        
+        .team-card.active {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .correct-animation {
+            animation: correctPulse 1s ease-in-out;
+            background-color: #10B981 !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+        
+        .wrong-animation {
+            animation: wrongShake 0.8s ease-in-out;
+            background-color: #EF4444 !important;
+            color: white !important;
+            border-color: #DC2626 !important;
+        }
+        
+        .correct-final {
+            background-color: #10B981 !important;
+            color: white !important;
+            border-color: #059669 !important;
+        }
+        
+        .wrong-final {
+            background-color: #EF4444 !important;
+            color: white !important;
+            border-color: #DC2626 !important;
+        }
+        
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.1); }
+            60% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+        
+        .question-slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #FFD700;
+            animation: confetti-fall 3s linear infinite;
+        }
+        
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+        
+        .screen-flash-correct {
+            animation: flashCorrect 0.8s ease-in-out;
+        }
+        
+        .screen-flash-wrong {
+            animation: flashWrong 0.8s ease-in-out;
+        }
+        
+        @keyframes flashCorrect {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(16, 185, 129, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        @keyframes flashWrong {
+            0% { background-color: transparent; }
+            50% { background-color: rgba(239, 68, 68, 0.3); }
+            100% { background-color: transparent; }
+        }
+        
+        .feedback-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: feedbackPop 1.5s ease-in-out;
+            white-space: nowrap;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .feedback-message {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .feedback-message {
+                font-size: 2rem;
+            }
+        }
+        
+        @keyframes feedbackPop {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            30% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+            70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 min-h-screen">
+    <!-- Header -->
+    <div class="text-center py-6">
+        <h1 class="text-2xl font-bold text-white mb-2">🏆 لعبة المعرفة التنافسية 🏆</h1>
+        <p class="text-xl text-blue-200">العودة للدراسة والانضباط المدرسي</p>
+    </div>
+
+    <!-- Team Names Setup Modal -->
+    <div id="setupModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl mx-4 text-center">
+            <div class="text-6xl mb-4">🎮</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">مرحباً بكم في لعبة المعرفة!</h2>
+            <p class="text-lg text-gray-600 mb-6">أدخلوا أسماء الفرق الأربعة للبدء</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label class="block text-right font-bold mb-2" style="color: #FFAA3C;">الفريق الأول:</label>
+                    <input type="text" id="teamInput1" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #FFAA3C;" placeholder="اسم الفريق الأول" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-right font-bold mb-2" style="color: #E6447D;">الفريق الثاني:</label>
+                    <input type="text" id="teamInput2" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #E6447D;" placeholder="اسم الفريق الثاني" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-right font-bold mb-2" style="color: #652E79;">الفريق الثالث:</label>
+                    <input type="text" id="teamInput3" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #652E79;" placeholder="اسم الفريق الثالث" maxlength="20">
+                </div>
+                <div>
+                    <label class="block text-right font-bold mb-2" style="color: #4BD4D4;">الفريق الرابع:</label>
+                    <input type="text" id="teamInput4" class="w-full p-3 border-2 rounded-lg text-center font-bold" style="border-color: #4BD4D4;" placeholder="اسم الفريق الرابع" maxlength="20">
+                </div>
+            </div>
+            
+            <button onclick="startGame()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg transition-all duration-300 transform hover:scale-105">
+                ابدأ اللعبة! 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Teams Display -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 mb-8">
+        <div id="team1" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #FFAA3C;">
+            <h3 class="font-bold text-lg mb-2" style="color: #FFAA3C;" id="teamName1">الفريق البرتقالي</h3>
+            <div class="text-2xl font-bold text-gray-800" id="score1">0</div>
+        </div>
+        
+        <div id="team2" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #E6447D;">
+            <h3 class="font-bold text-lg mb-2" style="color: #E6447D;" id="teamName2">الفريق الوردي</h3>
+            <div class="text-2xl font-bold text-gray-800" id="score2">0</div>
+        </div>
+        
+        <div id="team3" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #652E79;">
+            <h3 class="font-bold text-lg mb-2" style="color: #652E79;" id="teamName3">الفريق البنفسجي</h3>
+            <div class="text-2xl font-bold text-gray-800" id="score3">0</div>
+        </div>
+        
+        <div id="team4" class="team-card bg-white rounded-xl p-4 text-center shadow-lg border-4" style="border-color: #4BD4D4;">
+            <h3 class="font-bold text-lg mb-2" style="color: #4BD4D4;" id="teamName4">الفريق الفيروزي</h3>
+            <div class="text-2xl font-bold text-gray-800" id="score4">0</div>
+        </div>
+    </div>
+
+    <!-- Current Turn Indicator -->
+    <div class="text-center mb-6">
+        <div class="inline-block bg-white rounded-full px-6 py-3 shadow-lg">
+            <span class="text-lg font-bold text-gray-700">دور الفريق: </span>
+            <span id="currentTeam" class="text-xl font-bold" style="color: #FFAA3C;">البرتقالي 🟠</span>
+        </div>
+    </div>
+
+    <!-- Question Counter -->
+    <div class="text-center mb-6">
+        <div class="inline-block bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-full px-6 py-2 font-bold text-lg shadow-lg">
+            السؤال <span id="questionNumber">1</span> من 20
+        </div>
+    </div>
+
+    <!-- Game Area -->
+    <div id="gameArea" class="max-w-4xl mx-auto px-4">
+        <!-- Question Card -->
+        <div id="questionCard" class="bg-white rounded-2xl shadow-2xl p-8 mb-6 question-slide-in">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-4">📚</div>
+                <h2 id="questionText" class="text-2xl font-bold text-gray-800 leading-relaxed">
+                    ما هو أفضل وقت للمذاكرة؟
+                </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button onclick="selectAnswer(0)" class="answer-btn bg-gray-100 hover:bg-gray-200 text-gray-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-300">
+                    أ) في الصباح الباكر
+                </button>
+                <button onclick="selectAnswer(1)" class="answer-btn bg-gray-100 hover:bg-gray-200 text-gray-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-300">
+                    ب) في المساء
+                </button>
+                <button onclick="selectAnswer(2)" class="answer-btn bg-gray-100 hover:bg-gray-200 text-gray-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-300">
+                    ج) في أي وقت مناسب
+                </button>
+                <button onclick="selectAnswer(3)" class="answer-btn bg-gray-100 hover:bg-gray-200 text-gray-800 p-4 rounded-xl font-bold text-lg transition-all duration-300 transform hover:scale-105 border-2 border-gray-300">
+                    د) لا يهم الوقت
+                </button>
+            </div>
+        </div>
+        
+        <!-- Contact Section -->
+        <div class="text-center mt-6 mb-6">
+            <div class="bg-white rounded-lg shadow-md p-4">
+                <p class="text-gray-600 font-semibold text-sm mb-3">لطلبات الألعاب والمسابقات التعليمية</p>
+                <div class="flex flex-col items-center gap-2">
+                    <a href="https://t.me/Abu_Dareen" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition-all duration-300 transform hover:scale-105 flex items-center">
+                        <span class="ml-1">📱</span>
+                        تليجرام
+                    </a>
+                    <a href="https://wa.me/966591641133" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm font-semibold transition-all duration-300 transform hover:scale-105 flex items-center">
+                        <span class="ml-1">💬</span>
+                        واتساب
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-16 bg-gray-900 text-white py-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <!-- Logo and Channel Info -->
+            <div class="flex flex-col md:flex-row items-center justify-between mb-6">
+                <div class="flex items-center mb-4 md:mb-0">
+                    <img src="https://h.top4top.io/p_3453yqc3h0.png" alt="شعار رسم" class="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain ml-4">
+                    <div>
+                        <p class="text-lg font-bold">جميع الحقوق محفوظة</p>
+                        <a href="https://t.me/+SJnY9vPy7yo5YmI1" target="_blank" class="text-blue-400 hover:text-blue-300 transition-colors">
+                            لقناة رسم للتصميم والخدمات التعليمية
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+
+        </div>
+    </footer>
+
+    <!-- Final Results Modal -->
+    <div id="resultsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl mx-4 text-center">
+            <div class="text-6xl mb-4">🏆</div>
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">نتائج المسابقة النهائية!</h2>
+            <div id="finalRanking" class="space-y-4 mb-6">
+                <!-- Rankings will be inserted here -->
+            </div>
+            <button onclick="restartGame()" class="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-bold text-xl shadow-lg transition-all duration-300 transform hover:scale-105">
+                لعب مرة أخرى 🔄
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: "ما هو أفضل وقت للمذاكرة؟",
+                answers: ["في الصباح الباكر", "في المساء", "في أي وقت مناسب", "لا يهم الوقت"],
+                correct: 2,
+                emoji: "📚"
+            },
+            {
+                question: "كم ساعة نوم يحتاجها الطالب يومياً؟",
+                answers: ["4-5 ساعات", "6-7 ساعات", "8-9 ساعات", "10-12 ساعة"],
+                correct: 2,
+                emoji: "😴"
+            },
+            {
+                question: "ما هي أفضل طريقة لتنظيم الوقت؟",
+                answers: ["عدم التخطيط", "جدول زمني مرن", "جدول صارم", "الاعتماد على الذاكرة"],
+                correct: 1,
+                emoji: "⏰"
+            },
+            {
+                question: "ما أهمية الحضور المنتظم للمدرسة؟",
+                answers: ["غير مهم", "مهم أحياناً", "مهم جداً", "حسب المزاج"],
+                correct: 2,
+                emoji: "🏫"
+            },
+            {
+                question: "كيف نتعامل مع الواجبات المدرسية؟",
+                answers: ["تأجيلها", "إنجازها فوراً", "نسيانها", "طلب المساعدة دائماً"],
+                correct: 1,
+                emoji: "📝"
+            },
+            {
+                question: "ما فائدة المراجعة اليومية؟",
+                answers: ["لا فائدة", "تثبيت المعلومات", "إضاعة الوقت", "صعبة جداً"],
+                correct: 1,
+                emoji: "🔄"
+            },
+            {
+                question: "كيف نحافظ على التركيز أثناء الدرس؟",
+                answers: ["استخدام الهاتف", "الانتباه للمعلم", "النوم", "الحديث مع الأصدقاء"],
+                correct: 1,
+                emoji: "🎯"
+            },
+            {
+                question: "ما أهمية تناول الإفطار قبل المدرسة؟",
+                answers: ["غير مهم", "يعطي طاقة للتركيز", "يسبب النعاس", "مضيعة للوقت"],
+                correct: 1,
+                emoji: "🍳"
+            },
+            {
+                question: "كيف نستعد للامتحانات؟",
+                answers: ["المذاكرة في آخر لحظة", "التحضير المبكر", "عدم المذاكرة", "الاعتماد على الحظ"],
+                correct: 1,
+                emoji: "📊"
+            },
+            {
+                question: "ما أهمية احترام المعلمين؟",
+                answers: ["غير مهم", "مهم جداً", "أحياناً", "حسب المعلم"],
+                correct: 1,
+                emoji: "👨‍🏫"
+            },
+            {
+                question: "كيف نتعامل مع الأخطاء في الدراسة؟",
+                answers: ["نتجاهلها", "نتعلم منها", "نحزن عليها", "نلوم الآخرين"],
+                correct: 1,
+                emoji: "💡"
+            },
+            {
+                question: "ما فائدة المشاركة في الأنشطة المدرسية؟",
+                answers: ["مضيعة للوقت", "تطوير المهارات", "صعبة جداً", "غير مفيدة"],
+                correct: 1,
+                emoji: "🎭"
+            },
+            {
+                question: "كيف نحافظ على نظافة الكتب والأدوات؟",
+                answers: ["لا يهم", "العناية بها", "استبدالها دائماً", "إهمالها"],
+                correct: 1,
+                emoji: "📖"
+            },
+            {
+                question: "ما أهمية وضع أهداف دراسية؟",
+                answers: ["غير مهم", "يساعد على التقدم", "صعب التحقيق", "مضيعة للوقت"],
+                correct: 1,
+                emoji: "🎯"
+            },
+            {
+                question: "كيف نتعامل مع ضغط الامتحانات؟",
+                answers: ["القلق الشديد", "التحضير والهدوء", "تجنب المذاكرة", "اليأس"],
+                correct: 1,
+                emoji: "😌"
+            },
+            {
+                question: "ما أهمية القراءة خارج المنهج؟",
+                answers: ["غير مفيدة", "توسع المعرفة", "مملة", "صعبة"],
+                correct: 1,
+                emoji: "📚"
+            },
+            {
+                question: "كيف نطور مهارات الكتابة؟",
+                answers: ["عدم الكتابة", "الممارسة المستمرة", "الكتابة أحياناً", "تجنب الكتابة"],
+                correct: 1,
+                emoji: "✍️"
+            },
+            {
+                question: "ما فائدة العمل الجماعي في المدرسة؟",
+                answers: ["لا فائدة", "تعلم التعاون", "صعب جداً", "مضيعة للوقت"],
+                correct: 1,
+                emoji: "🤝"
+            },
+            {
+                question: "كيف نحافظ على الدافعية للتعلم؟",
+                answers: ["فقدان الأمل", "تذكر الأهداف", "عدم المحاولة", "اللامبالاة"],
+                correct: 1,
+                emoji: "🔥"
+            },
+            {
+                question: "ما أهمية الانضباط في الحياة المدرسية؟",
+                answers: ["غير مهم", "أساس النجاح", "صعب التطبيق", "مقيد للحرية"],
+                correct: 1,
+                emoji: "⭐"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let currentTeam = 1;
+        let scores = [0, 0, 0, 0];
+        let gameEnded = false;
+        let gameStarted = false;
+        
+        const teamColors = ['#FFAA3C', '#E6447D', '#652E79', '#4BD4D4'];
+        let teamNames = ['الفريق البرتقالي', 'الفريق الوردي', 'الفريق البنفسجي', 'الفريق الفيروزي'];
+        const teamEmojis = ['🟠', '🌸', '💜', '🩵'];
+
+        function startGame() {
+            // Get team names from inputs
+            const team1Name = document.getElementById('teamInput1').value.trim() || 'الفريق البرتقالي';
+            const team2Name = document.getElementById('teamInput2').value.trim() || 'الفريق الوردي';
+            const team3Name = document.getElementById('teamInput3').value.trim() || 'الفريق البنفسجي';
+            const team4Name = document.getElementById('teamInput4').value.trim() || 'الفريق الفيروزي';
+            
+            teamNames = [team1Name, team2Name, team3Name, team4Name];
+            
+            // Update team display names
+            document.getElementById('teamName1').textContent = team1Name;
+            document.getElementById('teamName2').textContent = team2Name;
+            document.getElementById('teamName3').textContent = team3Name;
+            document.getElementById('teamName4').textContent = team4Name;
+            
+            // Hide setup modal
+            document.getElementById('setupModal').classList.add('hidden');
+            
+            gameStarted = true;
+            updateCurrentTeamDisplay();
+            displayQuestion();
+        }
+
+        function updateCurrentTeamDisplay() {
+            if (!gameStarted) return;
+            
+            const currentTeamElement = document.getElementById('currentTeam');
+            currentTeamElement.textContent = teamNames[currentTeam - 1] + ' ' + teamEmojis[currentTeam - 1];
+            currentTeamElement.style.color = teamColors[currentTeam - 1];
+            
+            // Highlight current team
+            for (let i = 1; i <= 4; i++) {
+                const teamCard = document.getElementById(`team${i}`);
+                if (i === currentTeam) {
+                    teamCard.classList.add('active');
+                } else {
+                    teamCard.classList.remove('active');
+                }
+            }
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            
+            // Update question emoji
+            const questionCard = document.getElementById('questionCard');
+            questionCard.querySelector('.text-4xl').textContent = question.emoji;
+            
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            answerButtons.forEach((btn, index) => {
+                btn.textContent = `${index + 1}- ${question.answers[index]}`;
+                btn.disabled = false;
+                btn.classList.remove('correct-animation', 'wrong-animation');
+            });
+            
+            document.getElementById('nextBtn').classList.add('hidden');
+            questionCard.classList.add('question-slide-in');
+        }
+
+        function selectAnswer(answerIndex) {
+            const question = questions[currentQuestionIndex];
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            const isCorrect = answerIndex === question.correct;
+            
+            // Disable all buttons
+            answerButtons.forEach(btn => btn.disabled = true);
+            
+            if (isCorrect) {
+                scores[currentTeam - 1] += 10;
+                answerButtons[answerIndex].classList.add('correct-animation');
+                document.getElementById(`score${currentTeam}`).textContent = scores[currentTeam - 1];
+                
+                // Screen flash effect
+                document.body.classList.add('screen-flash-correct');
+                
+                // Show feedback message
+                showFeedbackMessage('✅ إجابة صحيحة! 🎉', '#10B981');
+                
+                createConfetti();
+                
+                // Auto move to next question
+                setTimeout(() => {
+                    document.body.classList.remove('screen-flash-correct');
+                    nextQuestion();
+                }, 2000);
+                
+            } else {
+                answerButtons[answerIndex].classList.add('wrong-animation');
+                
+                // Screen flash effect
+                document.body.classList.add('screen-flash-wrong');
+                
+                // Show feedback message
+                showFeedbackMessage('❌ إجابة خاطئة! 😔', '#EF4444');
+                
+                // Show correct answer briefly
+                setTimeout(() => {
+                    answerButtons[question.correct].classList.add('correct-final');
+                }, 500);
+                
+                // Auto move to next question
+                setTimeout(() => {
+                    document.body.classList.remove('screen-flash-wrong');
+                    nextQuestion();
+                }, 2500);
+            }
+        }
+
+        function showFeedbackMessage(message, color) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = 'feedback-message';
+            feedbackDiv.textContent = message;
+            feedbackDiv.style.color = color;
+            document.body.appendChild(feedbackDiv);
+            
+            setTimeout(() => {
+                feedbackDiv.remove();
+            }, 1500);
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = teamColors[Math.floor(Math.random() * 4)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex >= questions.length) {
+                showFinalResults();
+                return;
+            }
+            
+            // Switch to next team
+            currentTeam = (currentTeam % 4) + 1;
+            updateCurrentTeamDisplay();
+            
+            // Reset answer buttons
+            const answerButtons = document.querySelectorAll('.answer-btn');
+            answerButtons.forEach((btn, index) => {
+                btn.style.backgroundColor = '';
+                btn.style.color = '';
+                btn.style.borderColor = '';
+                btn.classList.remove('correct-animation', 'wrong-animation', 'correct-final', 'wrong-final');
+            });
+            
+            displayQuestion();
+        }
+
+        function showFinalResults() {
+            gameEnded = true;
+            
+            // Create ranking
+            const teamResults = scores.map((score, index) => ({
+                team: index + 1,
+                name: teamNames[index],
+                emoji: teamEmojis[index],
+                score: score,
+                color: teamColors[index]
+            })).sort((a, b) => b.score - a.score);
+            
+            const rankingHTML = teamResults.map((team, index) => {
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
+                return `
+                    <div class="flex items-center justify-between p-4 rounded-xl border-2" style="border-color: ${team.color};">
+                        <div class="flex items-center">
+                            <span class="text-3xl ml-4">${medal}</span>
+                            <span class="text-xl font-bold" style="color: ${team.color};">${team.name}</span>
+                        </div>
+                        <span class="text-2xl font-bold text-gray-800">${team.score} نقطة</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('finalRanking').innerHTML = rankingHTML;
+            document.getElementById('resultsModal').classList.remove('hidden');
+            
+            // Create celebration confetti
+            createConfetti();
+        }
+
+        function restartGame() {
+            currentQuestionIndex = 0;
+            currentTeam = 1;
+            scores = [0, 0, 0, 0];
+            gameEnded = false;
+            gameStarted = false;
+            
+            // Reset scores display
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`score${i}`).textContent = '0';
+            }
+            
+            // Reset team names to default
+            teamNames = ['الفريق البرتقالي', 'الفريق الوردي', 'الفريق البنفسجي', 'الفريق الفيروزي'];
+            document.getElementById('teamInput1').value = '';
+            document.getElementById('teamInput2').value = '';
+            document.getElementById('teamInput3').value = '';
+            document.getElementById('teamInput4').value = '';
+            
+            document.getElementById('resultsModal').classList.add('hidden');
+            document.getElementById('setupModal').classList.remove('hidden');
+        }
+
+        // Game will start when user clicks start button
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96e9cdb7d61c0e85',t:'MTc1NTEwNDc5Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
